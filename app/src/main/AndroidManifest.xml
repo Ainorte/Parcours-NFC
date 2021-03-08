@@ -3,20 +3,9 @@
     package="com.mbds.bpst.parcoursnfc">
 
     <!--
-    Android 11 package visibility changes require that apps specify which
-    set of other packages on the device that they can access. Since this
-    sample uses Google Maps, specifying the Google Maps package name is
-    required so that the buttons on the Map toolbar launch the Google Maps
-    app.
-    -->
-    <queries>
-        <package android:name="com.google.android.apps.maps" />
-    </queries>
-
-    <!--
-    This app requires location permissions for the layers demo.
-    The user's current location is displayed using the 'My Location' layer.
-    Access to location is needed for the UI Settings Demo
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the "MyLocation" functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
@@ -27,23 +16,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ParcoursNFC">
-        <activity android:name=".MainActivity">
+
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!--
-        To add your Maps API key to this project:
-        1. Open the root project'sl local.properties file
-        2. Add this line, where YOUR_API_KEY is your API key:
-            MAPS_API_KEY=YOUR_API_KEY
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
     </application>
 
 </manifest>
