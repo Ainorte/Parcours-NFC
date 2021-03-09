@@ -12,14 +12,14 @@ interface ParcoursDao {
     @Query("SELECT * FROM parcours")
     fun getAll(): List<Parcours>
 
-    @Query("SELECT * FROM parcours WHERE uid IN (:parcours)")
+    @Query("SELECT * FROM parcours WHERE name IN (:parcours)")
     fun loadAllByIds(parcours: MutableList<Parcours>): MutableList<Etape>
 
     @Query("SELECT * FROM parcours WHERE name LIKE :name LIMIT 1")
     fun findByName(name: String): Parcours
 
     @Insert
-    fun insertAll(vararg parcours: Parcours)
+    fun insert(vararg parcours: Parcours)
 
     @Delete
     fun delete(parcours: Parcours)
