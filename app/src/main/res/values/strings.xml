@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ParcoursNFC</string>
+    <string name="app_name">Parcours NFC</string>
     <string name="title_activity_main">Parcours NFC</string>
 
     <string name="new_step">Créer une nouvelle étape</string>

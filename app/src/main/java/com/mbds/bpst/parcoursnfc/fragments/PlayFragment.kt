@@ -60,7 +60,6 @@ class PlayFragment : Fragment(){
             fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
-
     }
 
     override fun onCreateView(
@@ -70,6 +69,11 @@ class PlayFragment : Fragment(){
         binding = FragmentPlayBinding.inflate(inflater, container, false)
         var mapFragment =  childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(callback)
+
+        binding.navigateButton.setOnClickListener {
+            //TODO : Intent navigation
+        }
+
         return binding.root
     }
 
