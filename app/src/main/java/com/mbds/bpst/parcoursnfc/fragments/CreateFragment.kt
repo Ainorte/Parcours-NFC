@@ -1,16 +1,13 @@
 package com.mbds.bpst.parcoursnfc.fragments
 
 import android.annotation.SuppressLint
-import android.icu.text.Transliterator
 import android.location.Location
-import android.location.LocationListener
 import android.os.Bundle
 import android.os.Looper
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -20,12 +17,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
-import com.mbds.bpst.parcoursnfc.databinding.FragmentPlayBinding
+import com.mbds.bpst.parcoursnfc.databinding.FragmentCreateBinding
 
 
-class PlayFragment : Fragment(){
+class CreateFragment : Fragment() {
 
-    private lateinit var binding: FragmentPlayBinding
+    private lateinit var binding: FragmentCreateBinding
     private lateinit var googleMap: GoogleMap
     private lateinit var location: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -64,10 +61,10 @@ class PlayFragment : Fragment(){
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentPlayBinding.inflate(inflater, container, false)
+        binding = FragmentCreateBinding.inflate(inflater, container, false)
         var mapFragment =  childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(callback)
         return binding.root
@@ -76,12 +73,12 @@ class PlayFragment : Fragment(){
     @SuppressLint("MissingPermission")
     override fun onResume() {
         super.onResume()
-         fusedLocationClient.requestLocationUpdates(
-             locationRequest,
-             locationCallback,
-             Looper.getMainLooper())
-        activity?.title = "Parcours NFC"
-        (activity as MainActivity).setMenuCreateButtonVisibility(true)
+        fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper())
+        activity?.title = "Créer un nouveau parcours"
+        (activity as MainActivity).setMenuCreateButtonVisibility(false)
     }
 
     override fun onPause() {
@@ -93,5 +90,4 @@ class PlayFragment : Fragment(){
         this.googleMap = googleMap
         this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f))
     }
-
 }

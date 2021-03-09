@@ -7,18 +7,22 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.mbds.bpst.parcoursnfc.databinding.ActivityMainBinding
+import com.mbds.bpst.parcoursnfc.fragments.CreateFragment
 import com.mbds.bpst.parcoursnfc.fragments.PlayFragment
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +57,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun explainForPermission() {
         Snackbar.make(
-            findViewById(android.R.id.content),
-            "Autoriser le GPS pour utiliser l'application",
-            Snackbar.LENGTH_LONG
+                findViewById(android.R.id.content),
+                "Autoriser le GPS pour utiliser l'application",
+                Snackbar.LENGTH_LONG
         ).setAction("Autoriser")
             { askForPermission() }
         .show()
@@ -73,9 +77,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<String>,
+            grantResults: IntArray
     ){
         if(requestCode == 0)
         {
@@ -96,5 +100,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        this.menu = menu
+        menuInflater.inflate(R.menu.menu, menu)
+        return true;
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.createItem -> {
+                changeFragment(CreateFragment(), true)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun setMenuCreateButtonVisibility(visibility: Boolean){
+        menu?.findItem(R.id.createItem)?.isVisible  = visibility
+    }
 
 }
