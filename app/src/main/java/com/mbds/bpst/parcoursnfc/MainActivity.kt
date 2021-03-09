@@ -1,15 +1,18 @@
 package com.mbds.bpst.parcoursnfc
 
 import android.Manifest.permission
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -23,6 +26,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var menu: Menu? = null
+    private var nfcAdapter: NfcAdapter? = null
+    private var pendingIntent: PendingIntent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +44,44 @@ class MainActivity : AppCompatActivity() {
             }
         }else{
             //c'est ok pour le GPS
-            changeFragment(PlayFragment(), false)
+            lauchApp()
         }
+    }
+
+    private fun lauchApp(){
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+        // check NFC feature:
+        if (nfcAdapter == null) {
+            needNfc()
+        }
+
+        // single top flag avoids activity multiple instances launching
+        pendingIntent = PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
+
+        changeFragment(PlayFragment(), false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val adapter = nfcAdapter ?: return run {
+            needNfc()
+        }
+
+        if (!adapter.isEnabled) {
+            // process error NFC not activated…
+            Toast.makeText(this, "Votre capteur NFC est désactivé", Toast.LENGTH_LONG).show()
+            finish()
+        }
+        // Activer la découverte de tag en --> Android va nous envoyer directement les tags détéctés
+        adapter.enableForegroundDispatch(this, pendingIntent, null, null)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        // Soyons sympa en désactivant le NFC quand l'activité n'est plus visible
+        nfcAdapter?.disableForegroundDispatch(this)
     }
 
     fun changeFragment(fragment: Fragment, addToBackStack: Boolean = true) {
@@ -50,6 +91,11 @@ class MainActivity : AppCompatActivity() {
                 addToBackStack(null)
         }.commit()
     }
+
+    private fun needNfc() {
+        Toast.makeText(this, "Cette application ne fonctionne que sur un téléphone NFC", Toast.LENGTH_LONG).show()
+    }
+
 
     private fun askForPermission() {
         requestPermissions(arrayOf(permission.ACCESS_FINE_LOCATION), 0)
@@ -86,7 +132,7 @@ class MainActivity : AppCompatActivity() {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 //Ok pour le GPS
-                changeFragment(PlayFragment(), false)
+                lauchApp()
             }
             else if (shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION)) {
                 // permission refusée avec demande de ne pas redemander
@@ -118,6 +164,15 @@ class MainActivity : AppCompatActivity() {
 
     fun setMenuCreateButtonVisibility(visibility: Boolean){
         menu?.findItem(R.id.createItem)?.isVisible  = visibility
+    }
+
+    override fun onNewIntent(intent: Intent){
+        super.onNewIntent(intent)
+
+        //Appelé quand on approche un tag nfc.
+
+        Toast.makeText(this, "tag detecté", Toast.LENGTH_LONG).show()
+
     }
 
 }

@@ -43,15 +43,10 @@ class PlayFragment : Fragment(){
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 location = locationResult.lastLocation
-
-                var position = LatLng(location.latitude, location.longitude)
-
-                googleMap.clear()
                 if(firstLoc){
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(position))
-                    firstLoc = false;
+                    firstLoc = false
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
                 }
-                googleMap.addMarker(MarkerOptions().position(position))
             }
         }
 
@@ -93,9 +88,11 @@ class PlayFragment : Fragment(){
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
         this.googleMap = googleMap
-        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f))
+        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(17.0f))
+        this.googleMap.isMyLocationEnabled = true
     }
 
 }
