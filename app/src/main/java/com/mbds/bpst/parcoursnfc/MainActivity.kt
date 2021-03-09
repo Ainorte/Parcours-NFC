@@ -12,6 +12,7 @@ import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -22,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.mbds.bpst.parcoursnfc.databinding.ActivityMainBinding
+import com.mbds.bpst.parcoursnfc.fragments.ActionNFC
 import com.mbds.bpst.parcoursnfc.fragments.CreateFragment
 import com.mbds.bpst.parcoursnfc.fragments.PlayFragment
 import java.io.UnsupportedEncodingException
@@ -30,17 +32,20 @@ import kotlin.experimental.and
 
 class MainActivity : AppCompatActivity() {
 
+    private var fragment:Fragment? = null
+
     private lateinit var binding: ActivityMainBinding
     private var menu: Menu? = null
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
 
-    var nfcAction:((Tag, Ndef, Array<Parcelable>?) -> Unit)? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(LayoutInflater.from(baseContext))
+
+        launchNFC()
+
         if( ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             //Demander la permission d'utiliser le GPS
             if(shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION)){
@@ -52,11 +57,12 @@ class MainActivity : AppCompatActivity() {
             }
         }else{
             //c'est ok pour le GPS
-            lauchApp()
+            changeFragment(PlayFragment(), false)
+            nfcTrigger(intent)
         }
     }
 
-    private fun lauchApp(){
+    private fun launchNFC(){
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         // check NFC feature:
         if (nfcAdapter == null) {
@@ -65,8 +71,6 @@ class MainActivity : AppCompatActivity() {
 
         // single top flag avoids activity multiple instances launching
         pendingIntent = PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
-
-        changeFragment(PlayFragment(), false)
     }
 
     override fun onResume() {
@@ -93,6 +97,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun changeFragment(fragment: Fragment, addToBackStack: Boolean = true) {
+        this.fragment = fragment
+
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, fragment)
             if (addToBackStack)
@@ -140,7 +146,7 @@ class MainActivity : AppCompatActivity() {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 //Ok pour le GPS
-                lauchApp()
+                changeFragment(PlayFragment(), false)
             }
             else if (shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION)) {
                 // permission refusée avec demande de ne pas redemander
@@ -177,6 +183,10 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
+        nfcTrigger(intent)
+    }
+
+    private fun nfcTrigger(intent: Intent){
         //Appelé quand on approche un tag nfc.
 
         val action = intent.action
@@ -188,7 +198,9 @@ class MainActivity : AppCompatActivity() {
 
                 val rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
 
-                nfcAction?.invoke(tag, ndef, rawMsgs)
+                if(fragment is ActionNFC){
+                    (fragment as ActionNFC).onNFC(tag, ndef, rawMsgs, this)
+                }
             }
         }
     }

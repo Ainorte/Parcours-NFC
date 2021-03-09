@@ -1,6 +1,7 @@
 package com.mbds.bpst.parcoursnfc.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.location.Location
 import android.nfc.FormatException
 import android.nfc.NdefMessage
@@ -32,7 +33,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 
-class CreateFragment : Fragment() {
+class CreateFragment : Fragment(), ActionNFC {
 
     private lateinit var binding: FragmentCreateBinding
     private lateinit var googleMap: GoogleMap
@@ -88,47 +89,6 @@ class CreateFragment : Fragment() {
         activity?.title = "Créer un nouveau parcours"
         var act = activity as MainActivity
         act.setMenuCreateButtonVisibility(false)
-        act.nfcAction = { tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>? ->
-            if(!ndef.isWritable){
-                Toast.makeText(context, "Ce tag n'est pas modifiable", Toast.LENGTH_LONG).show()
-            }
-            else{
-                val dimension = 2
-                val ndefRecords = arrayOfNulls<NdefRecord>(dimension)
-
-                var msgTxt = "${location.latitude};${location.longitude}"
-                var mimeType = "application/parcoursnfc" // your MIME type
-                var ndefRecord = NdefRecord.createMime(
-                        mimeType,
-                        msgTxt.toByteArray(Charset.forName("UTF-8"))
-                )
-                ndefRecords[0] = ndefRecord
-
-                msgTxt = "toto"
-                mimeType = "application/parcoursnfc" // your MIME type
-                ndefRecord = NdefRecord.createMime(
-                        mimeType,
-                        msgTxt.toByteArray(Charset.forName("UTF-8"))
-                )
-                ndefRecords[1] = ndefRecord
-
-                val ndefMessage = NdefMessage(ndefRecords)
-                val messageSize = ndefMessage.toByteArray().size
-
-                if (ndef.maxSize >= messageSize) {
-                    try {
-                        ndef.connect()
-                        ndef.writeNdefMessage(ndefMessage)
-                        ndef.close()
-                        Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_SHORT).show()
-                    } catch (e1: IOException) {
-                        e1.printStackTrace()
-                    } catch (e2: FormatException) {
-                        e2.printStackTrace()
-                    }
-                }
-            }
-        }
     }
 
     override fun onPause() {
@@ -141,5 +101,47 @@ class CreateFragment : Fragment() {
         this.googleMap = googleMap
         this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(17.0f))
         this.googleMap.isMyLocationEnabled = true
+    }
+
+    override fun onNFC(tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>?, context: Context) {
+        if(!ndef.isWritable){
+            Toast.makeText(context, "Ce tag n'est pas modifiable", Toast.LENGTH_LONG).show()
+        }
+        else{
+            val dimension = 2
+            val ndefRecords = arrayOfNulls<NdefRecord>(dimension)
+
+            var msgTxt = "${location.latitude};${location.longitude}"
+            var mimeType = "application/parcoursnfc" // your MIME type
+            var ndefRecord = NdefRecord.createMime(
+                mimeType,
+                msgTxt.toByteArray(Charset.forName("UTF-8"))
+            )
+            ndefRecords[0] = ndefRecord
+
+            msgTxt = "toto"
+            mimeType = "application/parcoursnfc" // your MIME type
+            ndefRecord = NdefRecord.createMime(
+                mimeType,
+                msgTxt.toByteArray(Charset.forName("UTF-8"))
+            )
+            ndefRecords[1] = ndefRecord
+
+            val ndefMessage = NdefMessage(ndefRecords)
+            val messageSize = ndefMessage.toByteArray().size
+
+            if (ndef.maxSize >= messageSize) {
+                try {
+                    ndef.connect()
+                    ndef.writeNdefMessage(ndefMessage)
+                    ndef.close()
+                    Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_SHORT).show()
+                } catch (e1: IOException) {
+                    e1.printStackTrace()
+                } catch (e2: FormatException) {
+                    e2.printStackTrace()
+                }
+            }
+        }
     }
 }

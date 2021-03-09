@@ -1,6 +1,7 @@
 package com.mbds.bpst.parcoursnfc.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.icu.text.Transliterator
 import android.location.Location
 import android.location.LocationListener
@@ -30,7 +31,7 @@ import java.io.UnsupportedEncodingException
 import kotlin.experimental.and
 
 
-class PlayFragment : Fragment(){
+class PlayFragment : Fragment(), ActionNFC{
 
     private lateinit var binding: FragmentPlayBinding
     private lateinit var googleMap: GoogleMap
@@ -90,32 +91,6 @@ class PlayFragment : Fragment(){
 
         var act = activity as MainActivity
         act.setMenuCreateButtonVisibility(true)
-    act.nfcAction = { tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>? ->
-
-        var all = ""
-
-        val ndefMessage = rawMsgs?.size?.let { arrayOfNulls<NdefMessage>(it) }!!
-        for (i in rawMsgs.indices) {
-            ndefMessage[i] = rawMsgs[i] as NdefMessage
-            for (j in ndefMessage[i]!!.records.indices) {
-                val ndefRecord = ndefMessage[i]!!.records[j]
-                val payload = ndefRecord.payload
-                val languageSize: Int = (payload[0] and 51.toByte()).toInt()
-                try {
-                    val type = ndefRecord.toMimeType()
-                    val recordTxt = String(
-                            payload, 0,
-                            payload.size,
-                            charset("UTF-8"))
-                    all += recordTxt
-                } catch (e: UnsupportedEncodingException) {
-                    e.printStackTrace()
-                }
-
-                Toast.makeText(context, all, Toast.LENGTH_SHORT).show()
-            }
-        }
-        }
 
     }
 
@@ -129,6 +104,32 @@ class PlayFragment : Fragment(){
         this.googleMap = googleMap
         this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(17.0f))
         this.googleMap.isMyLocationEnabled = true
+    }
+
+    override fun onNFC(tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>?, context: Context) {
+        var all = ""
+
+        val ndefMessage = rawMsgs?.size?.let { arrayOfNulls<NdefMessage>(it) }!!
+        for (i in rawMsgs.indices) {
+            ndefMessage[i] = rawMsgs[i] as NdefMessage
+            for (j in ndefMessage[i]!!.records.indices) {
+                val ndefRecord = ndefMessage[i]!!.records[j]
+                val payload = ndefRecord.payload
+                val languageSize: Int = (payload[0] and 51.toByte()).toInt()
+                try {
+                    val type = ndefRecord.toMimeType()
+                    val recordTxt = String(
+                        payload, 0,
+                        payload.size,
+                        charset("UTF-8"))
+                    all += recordTxt
+                } catch (e: UnsupportedEncodingException) {
+                    e.printStackTrace()
+                }
+
+                Toast.makeText(context, all, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 }
