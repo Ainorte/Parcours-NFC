@@ -4,10 +4,11 @@ import androidx.room.Embedded
 import androidx.room.Relation
 
 data class ParcoursWithEtapes (
-    @Embedded val parcours: Parcours,
-    @Relation(
+    val parcours: Parcours,
+    /*@Relation(
         parentColumn = "id",
         entityColumn = "id"
             )
+    @Embedded*/
     val etapes: List<Etape>
         )

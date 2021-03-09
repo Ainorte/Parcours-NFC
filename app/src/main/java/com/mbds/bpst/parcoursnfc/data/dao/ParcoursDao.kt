@@ -31,5 +31,8 @@ interface ParcoursDao {
     @Delete
     fun deleteEtape(etape: Etape)
 
+    @Insert
+    fun insertParcoursWithEtapes(parcours: Parcours, etapes: List<Etape>)
+
 
 }

@@ -86,7 +86,7 @@ class CreateFragment : Fragment(), ActionNFC {
     suspend fun insertData(){
         withContext(Dispatchers.IO)
         {
-            repo.insert(Etape(null, "toto", LatLng(location.latitude, location.longitude), null))
+            repo.insert(Etape("toto", LatLng(location.latitude, location.longitude)))
         }
     }
 

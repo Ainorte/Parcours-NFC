@@ -39,26 +39,28 @@ abstract class ParcoursRoomDatabase : RoomDatabase() {
             // Delete all content here.
             //parcoursDao.deleteAll()
 
-            var parcours1 = Parcours(0,"Parcours 1")
+            var parcours1 = Parcours("Parcours 1")
             var indice3 = "Fin du parcours"
             var latLng3 = LatLng(0.000000, 0.000000)
-            var etape3 = Etape(3, indice3, latLng3, parcours1.id)
+            var etape3 = Etape(indice3, latLng3)
 
             var indice2 = "Près de la cafetière"
             var latLng2= LatLng(43.615115,7.061264)
-            var etape2 = Etape(2, indice2, latLng2, parcours1.id)
+            var etape2 = Etape(indice2, latLng2)
 
             var indice1 = "Point de départ"
             var latLng1 = LatLng(43.750234, 7.072342)
-            var etape1 = Etape(1, indice1, latLng1, parcours1.id)
+            var etape1 = Etape(indice1, latLng1)
 
-
+            var listEtape = listOf<Etape>(etape1, etape2, etape3)
             // Add sample articles.
 
             parcoursDao.insertParcours(parcours1)
             parcoursDao.insertEtape(etape1)
             parcoursDao.insertEtape(etape2)
             parcoursDao.insertEtape(etape3)
+            parcoursDao.insertParcoursWithEtapes(parcours1,listEtape)
+
 
             //article = Article("World!")
             //articleDao.insert(article)
