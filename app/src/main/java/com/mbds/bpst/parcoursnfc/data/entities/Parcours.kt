@@ -7,7 +7,7 @@ import com.mbds.bpst.parcoursnfc.data.entities.Etape
 
 @Entity
 data class Parcours (
-    @PrimaryKey val uid: Int,
+    @PrimaryKey
     @ColumnInfo(name= "name") val name: String?,
     @ColumnInfo(name = "etapes") val etape: MutableList<Etape>?
 )
