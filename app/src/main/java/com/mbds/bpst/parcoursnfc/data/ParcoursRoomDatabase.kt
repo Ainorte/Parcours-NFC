@@ -1,6 +1,7 @@
 package com.mbds.bpst.parcoursnfc.data
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -9,6 +10,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.mbds.bpst.parcoursnfc.data.dao.ParcoursDao
 import com.mbds.bpst.parcoursnfc.data.entities.Etape
 import com.mbds.bpst.parcoursnfc.data.entities.Parcours
+import com.mbds.bpst.parcoursnfc.data.entities.ParcoursWithEtapes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -33,27 +35,25 @@ abstract class ParcoursRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(parcoursDao: ParcoursDao) {
             // Delete all content here.
             //parcoursDao.deleteAll()
-
-            var listEtape = mutableListOf<Etape>()
+            var parcours1 = Parcours(1, "Parcours 1")
+            var listEtape: List<Etape> = emptyList()
             var indice3 = "Fin du parcours"
             var latLng3= LatLng(0.000000, 0.000000)
-            var etape3 = Etape(indice3, latLng3)
+            var etape3 = Etape(3, indice3, latLng3, parcours1.parcoursId)
 
             var indice2 = "Près de la cafetière"
             var latLng2= LatLng(43.615115,7.061264)
-            var etape2 = Etape(indice2, latLng2)
+            var etape2 = Etape(2, indice2, latLng2, parcours1.parcoursId)
 
             var indice1 = "Point de départ"
             var latLng1 = LatLng(43.750234, 7.072342)
-            var etape1 = Etape(indice1, latLng1)
+            var etape1 = Etape(1, indice1, latLng1, parcours1.parcoursId)
 
-            listEtape.add(0, etape1)
-            listEtape.add(1, etape2)
-            listEtape.add(2, etape3)
+
 
             // Add sample articles.
-            var parcours = Parcours("Parcours 1", listEtape)
-            parcoursDao.insert(parcours)
+
+            //parcoursDao.insert(parcours1, )
             //article = Article("World!")
             //articleDao.insert(article)
 
