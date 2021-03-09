@@ -18,10 +18,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
+import com.mbds.bpst.parcoursnfc.data.ParcoursApplication
+import com.mbds.bpst.parcoursnfc.data.models.ParcoursViewModel
+import com.mbds.bpst.parcoursnfc.data.models.ParcoursViewModelFactory
 import com.mbds.bpst.parcoursnfc.databinding.ActivityMainBinding
 import com.mbds.bpst.parcoursnfc.fragments.ActionNFC
 import com.mbds.bpst.parcoursnfc.fragments.CreateFragment
@@ -38,6 +42,10 @@ class MainActivity : AppCompatActivity() {
     private var menu: Menu? = null
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
+
+    val parcoursViewModel: ParcoursViewModel by viewModels {
+        ParcoursViewModelFactory((application as ParcoursApplication).repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             changeFragment(PlayFragment(), false)
             nfcTrigger(intent)
         }
+
     }
 
     private fun launchNFC(){

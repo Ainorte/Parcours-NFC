@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@Database(entities = arrayOf(Parcours::class, Etape::class), version = 1)
+@Database(entities = arrayOf(Parcours::class, Etape::class), version = 1, exportSchema = false)
 @TypeConverters(LocationConverters::class)
 
 abstract class ParcoursRoomDatabase : RoomDatabase() {
