@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,7 +26,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
+import com.mbds.bpst.parcoursnfc.data.ParcoursRoomDatabase_Impl
+import com.mbds.bpst.parcoursnfc.data.dao.ParcoursDao_Impl
+import com.mbds.bpst.parcoursnfc.data.entities.Etape
+import com.mbds.bpst.parcoursnfc.data.repository.EtapeRepository
 import com.mbds.bpst.parcoursnfc.databinding.FragmentCreateBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -43,6 +51,8 @@ class CreateFragment : Fragment(), ActionNFC {
     private lateinit var locationRequest: LocationRequest
     private var firstLoc = true
 
+    val repo = EtapeRepository(ParcoursDao_Impl(ParcoursRoomDatabase_Impl()))
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +68,10 @@ class CreateFragment : Fragment(), ActionNFC {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
                     firstLoc = false;
                 }
+
+                lifecycleScope.launch {
+                    insertData()
+                }
             }
         }
 
@@ -67,6 +81,13 @@ class CreateFragment : Fragment(), ActionNFC {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
 
+    }
+
+    suspend fun insertData(){
+        withContext(Dispatchers.IO)
+        {
+            repo.insert(Etape(null, "toto", LatLng(location.latitude, location.longitude), null))
+        }
     }
 
     override fun onCreateView(
