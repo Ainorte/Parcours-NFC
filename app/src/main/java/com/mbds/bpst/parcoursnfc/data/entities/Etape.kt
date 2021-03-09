@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 
 @Entity
 data class Etape (
-    @PrimaryKey val etapeId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "indice") val indice: String,
     @ColumnInfo(name = "location") val location: LatLng,
     @ColumnInfo(name = "parcoursId") val parcoursId: Long
