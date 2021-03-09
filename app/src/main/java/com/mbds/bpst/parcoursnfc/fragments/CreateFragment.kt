@@ -1,17 +1,20 @@
 package com.mbds.bpst.parcoursnfc.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.location.Location
-import android.nfc.NfcAdapter
-import android.nfc.NfcManager
+import android.nfc.FormatException
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
+import android.nfc.Tag
+import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.os.Looper
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.getSystemService
+import android.widget.Toast
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -22,6 +25,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
 import com.mbds.bpst.parcoursnfc.databinding.FragmentCreateBinding
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.UnsupportedEncodingException
+import java.nio.charset.Charset
+import java.util.*
 
 
 class CreateFragment : Fragment() {
@@ -33,7 +41,6 @@ class CreateFragment : Fragment() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
     private var firstLoc = true
-    private var adapter: NfcAdapter? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +66,6 @@ class CreateFragment : Fragment() {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
 
-
-
     }
 
     override fun onCreateView(
@@ -81,12 +86,50 @@ class CreateFragment : Fragment() {
                 locationCallback,
                 Looper.getMainLooper())
         activity?.title = "Créer un nouveau parcours"
-        (activity as MainActivity).setMenuCreateButtonVisibility(false)
+        var act = activity as MainActivity
+        act.setMenuCreateButtonVisibility(false)
+        act.nfcAction = { tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>? ->
+            if(!ndef.isWritable){
+                Toast.makeText(context, "Ce tag n'est pas modifiable", Toast.LENGTH_LONG).show()
+            }
+            else{
+                val dimension = 2
+                val ndefRecords = arrayOfNulls<NdefRecord>(dimension)
+
+                var msgTxt = "${location.latitude};${location.longitude}"
+                var mimeType = "application/parcoursnfc" // your MIME type
+                var ndefRecord = NdefRecord.createMime(
+                        mimeType,
+                        msgTxt.toByteArray(Charset.forName("UTF-8"))
+                )
+                ndefRecords[0] = ndefRecord
+
+                msgTxt = "toto"
+                mimeType = "application/parcoursnfc" // your MIME type
+                ndefRecord = NdefRecord.createMime(
+                        mimeType,
+                        msgTxt.toByteArray(Charset.forName("UTF-8"))
+                )
+                ndefRecords[1] = ndefRecord
+
+                val ndefMessage = NdefMessage(ndefRecords)
+                val messageSize = ndefMessage.toByteArray().size
+
+                if (ndef.maxSize >= messageSize) {
+                    try {
+                        ndef.connect()
+                        ndef.writeNdefMessage(ndefMessage)
+                        ndef.close()
+                        Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_SHORT).show()
+                    } catch (e1: IOException) {
+                        e1.printStackTrace()
+                    } catch (e2: FormatException) {
+                        e2.printStackTrace()
+                    }
+                }
+            }
+        }
     }
-
-    // to init NfcAdapter
-
-
 
     override fun onPause() {
         super.onPause()

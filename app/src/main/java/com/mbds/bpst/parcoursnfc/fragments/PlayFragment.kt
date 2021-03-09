@@ -4,11 +4,16 @@ import android.annotation.SuppressLint
 import android.icu.text.Transliterator
 import android.location.Location
 import android.location.LocationListener
+import android.nfc.NdefMessage
+import android.nfc.Tag
+import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.os.Looper
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
@@ -21,6 +26,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
 import com.mbds.bpst.parcoursnfc.databinding.FragmentPlayBinding
+import java.io.UnsupportedEncodingException
+import kotlin.experimental.and
 
 
 class PlayFragment : Fragment(){
@@ -80,7 +87,36 @@ class PlayFragment : Fragment(){
              locationCallback,
              Looper.getMainLooper())
         activity?.title = "Parcours NFC"
-        (activity as MainActivity).setMenuCreateButtonVisibility(true)
+
+        var act = activity as MainActivity
+        act.setMenuCreateButtonVisibility(true)
+    act.nfcAction = { tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>? ->
+
+        var all = ""
+
+        val ndefMessage = rawMsgs?.size?.let { arrayOfNulls<NdefMessage>(it) }!!
+        for (i in rawMsgs.indices) {
+            ndefMessage[i] = rawMsgs[i] as NdefMessage
+            for (j in ndefMessage[i]!!.records.indices) {
+                val ndefRecord = ndefMessage[i]!!.records[j]
+                val payload = ndefRecord.payload
+                val languageSize: Int = (payload[0] and 51.toByte()).toInt()
+                try {
+                    val type = ndefRecord.toMimeType()
+                    val recordTxt = String(
+                            payload, 0,
+                            payload.size,
+                            charset("UTF-8"))
+                    all += recordTxt
+                } catch (e: UnsupportedEncodingException) {
+                    e.printStackTrace()
+                }
+
+                Toast.makeText(context, all, Toast.LENGTH_SHORT).show()
+            }
+        }
+        }
+
     }
 
     override fun onPause() {

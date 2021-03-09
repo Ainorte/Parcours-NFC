@@ -5,8 +5,12 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
+import android.nfc.Tag
+import android.nfc.tech.Ndef
 import android.os.Bundle
+import android.os.Parcelable
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.Menu
@@ -20,6 +24,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.mbds.bpst.parcoursnfc.databinding.ActivityMainBinding
 import com.mbds.bpst.parcoursnfc.fragments.CreateFragment
 import com.mbds.bpst.parcoursnfc.fragments.PlayFragment
+import java.io.UnsupportedEncodingException
+import kotlin.experimental.and
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     private var menu: Menu? = null
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
+
+    var nfcAction:((Tag, Ndef, Array<Parcelable>?) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,13 +174,22 @@ class MainActivity : AppCompatActivity() {
         menu?.findItem(R.id.createItem)?.isVisible  = visibility
     }
 
-    override fun onNewIntent(intent: Intent){
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
         //Appelé quand on approche un tag nfc.
 
-        Toast.makeText(this, "tag detecté", Toast.LENGTH_LONG).show()
+        val action = intent.action
+        // check the event was triggered by the tag discovery
+        if (NfcAdapter.ACTION_TAG_DISCOVERED == action || NfcAdapter.ACTION_TECH_DISCOVERED == action || NfcAdapter.ACTION_NDEF_DISCOVERED == action) {
+            val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+            if(tag != null){
+                val ndef = Ndef.get(tag)
 
+                val rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+
+                nfcAction?.invoke(tag, ndef, rawMsgs)
+            }
+        }
     }
-
 }
