@@ -4,4 +4,5 @@
 
     <string name="new_step">Créer une nouvelle étape</string>
     <string name="new_parcours">Créer un parcours</string>
+    <string name="desc">Tapez votre description</string>
 </resources>
