@@ -1,13 +1,17 @@
 package com.mbds.bpst.parcoursnfc.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.location.Location
+import android.nfc.NfcAdapter
+import android.nfc.NfcManager
 import android.os.Bundle
 import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -29,6 +33,7 @@ class CreateFragment : Fragment() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
     private var firstLoc = true
+    private var adapter: NfcAdapter? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +59,8 @@ class CreateFragment : Fragment() {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
 
+
+
     }
 
     override fun onCreateView(
@@ -76,6 +83,10 @@ class CreateFragment : Fragment() {
         activity?.title = "Créer un nouveau parcours"
         (activity as MainActivity).setMenuCreateButtonVisibility(false)
     }
+
+    // to init NfcAdapter
+
+
 
     override fun onPause() {
         super.onPause()
