@@ -41,19 +41,15 @@ class CreateFragment : Fragment() {
                 locationResult ?: return
                 location = locationResult.lastLocation
 
-                var position = LatLng(location.latitude, location.longitude)
-
-                googleMap.clear()
                 if(firstLoc){
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(position))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
                     firstLoc = false;
                 }
-                googleMap.addMarker(MarkerOptions().position(position))
             }
         }
 
         locationRequest = LocationRequest.create()?.apply {
-            interval = 10000
+            interval = 5000
             fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
@@ -86,8 +82,10 @@ class CreateFragment : Fragment() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
         this.googleMap = googleMap
-        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f))
+        this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(17.0f))
+        this.googleMap.isMyLocationEnabled = true
     }
 }
