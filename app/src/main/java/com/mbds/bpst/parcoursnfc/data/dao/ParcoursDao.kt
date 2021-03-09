@@ -9,15 +9,27 @@ import com.mbds.bpst.parcoursnfc.data.entities.ParcoursWithEtapes
 interface ParcoursDao {
     @Transaction
     @Query("SELECT * FROM parcours")
-    fun getAll(): List<Parcours>
+    fun getAllParcours(): List<Parcours>
 
+    @Query("SELECT * FROM etape")
+    fun getAllEtape(): List<Etape>
 
     @Query("SELECT * FROM parcours WHERE name LIKE :name LIMIT 1")
-    fun findByName(name: String): Parcours
+    fun findParcoursByName(name: String): Parcours
+
 
     @Insert
-    fun insert(vararg parcours: Parcours)
+    fun insertParcours(vararg parcours: Parcours)
 
     @Delete
-    fun delete(parcours: Parcours)
+    fun deleteParcours(parcours: Parcours)
+
+
+    @Insert
+    fun insertEtape(vararg etape: Etape)
+
+    @Delete
+    fun deleteEtape(etape: Etape)
+
+
 }

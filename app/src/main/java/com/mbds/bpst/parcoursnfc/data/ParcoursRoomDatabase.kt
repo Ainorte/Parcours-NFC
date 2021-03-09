@@ -1,10 +1,10 @@
 package com.mbds.bpst.parcoursnfc.data
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.android.gms.maps.model.LatLng
 import com.mbds.bpst.parcoursnfc.data.dao.ParcoursDao
@@ -14,7 +14,10 @@ import com.mbds.bpst.parcoursnfc.data.entities.ParcoursWithEtapes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = arrayOf(Parcours::class), version = 1)
+
+@Database(entities = arrayOf(Parcours::class, Etape::class), version = 1)
+@TypeConverters(LocationConverters::class)
+
 abstract class ParcoursRoomDatabase : RoomDatabase() {
     abstract fun parcoursDao(): ParcoursDao
 
@@ -35,25 +38,28 @@ abstract class ParcoursRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(parcoursDao: ParcoursDao) {
             // Delete all content here.
             //parcoursDao.deleteAll()
-            var parcours1 = Parcours(1, "Parcours 1")
-            var listEtape: List<Etape> = emptyList()
+
+            var parcours1 = Parcours(0,"Parcours 1")
             var indice3 = "Fin du parcours"
-            var latLng3= LatLng(0.000000, 0.000000)
-            var etape3 = Etape(3, indice3, latLng3, parcours1.parcoursId)
+            var latLng3 = LatLng(0.000000, 0.000000)
+            var etape3 = Etape(3, indice3, latLng3, parcours1.id)
 
             var indice2 = "Près de la cafetière"
             var latLng2= LatLng(43.615115,7.061264)
-            var etape2 = Etape(2, indice2, latLng2, parcours1.parcoursId)
+            var etape2 = Etape(2, indice2, latLng2, parcours1.id)
 
             var indice1 = "Point de départ"
             var latLng1 = LatLng(43.750234, 7.072342)
-            var etape1 = Etape(1, indice1, latLng1, parcours1.parcoursId)
-
+            var etape1 = Etape(1, indice1, latLng1, parcours1.id)
 
 
             // Add sample articles.
 
-            //parcoursDao.insert(parcours1, )
+            parcoursDao.insertParcours(parcours1)
+            parcoursDao.insertEtape(etape1)
+            parcoursDao.insertEtape(etape2)
+            parcoursDao.insertEtape(etape3)
+
             //article = Article("World!")
             //articleDao.insert(article)
 
