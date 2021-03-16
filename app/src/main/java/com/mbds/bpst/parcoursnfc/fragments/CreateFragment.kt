@@ -29,6 +29,7 @@ import com.mbds.bpst.parcoursnfc.R
 import com.mbds.bpst.parcoursnfc.data.ParcoursRoomDatabase_Impl
 import com.mbds.bpst.parcoursnfc.data.dao.ParcoursDao_Impl
 import com.mbds.bpst.parcoursnfc.data.entities.Etape
+import com.mbds.bpst.parcoursnfc.data.models.EtapeViewModel
 import com.mbds.bpst.parcoursnfc.data.repository.EtapeRepository
 import com.mbds.bpst.parcoursnfc.data.repository.ParcoursRepository
 import com.mbds.bpst.parcoursnfc.databinding.FragmentCreateBinding
@@ -50,7 +51,7 @@ class CreateFragment : Fragment(), ActionNFC {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
-    private lateinit var parcoursRepository: ParcoursRepository
+    private lateinit var etapeViewModel: EtapeViewModel
     private var firstLoc = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,10 +118,12 @@ class CreateFragment : Fragment(), ActionNFC {
             Toast.makeText(context, "Ce tag n'est pas modifiable", Toast.LENGTH_LONG).show()
         }
         else{
+            var lastEtape = etapeViewModel.getAllEtapeByRead(false).last()
+
             val dimension = 2
             val ndefRecords = arrayOfNulls<NdefRecord>(dimension)
 
-            var msgTxt = "${location.latitude};${location.longitude}"
+            var msgTxt = "${lastEtape.location.latitude};${lastEtape.location.longitude}"
             var mimeType = "application/parcoursnfc" // your MIME type
             var ndefRecord = NdefRecord.createMime(
                 mimeType,
@@ -128,7 +131,7 @@ class CreateFragment : Fragment(), ActionNFC {
             )
             ndefRecords[0] = ndefRecord
 
-            msgTxt = "toto"
+            msgTxt = binding.descField.text.toString()
             mimeType = "application/parcoursnfc" // your MIME type
             ndefRecord = NdefRecord.createMime(
                 mimeType,
@@ -146,7 +149,11 @@ class CreateFragment : Fragment(), ActionNFC {
                     ndef.close()
                     Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_SHORT).show()
                     //On récupère la localisation actuelle et on l'écrit en base de donnée
-                    
+
+                    val newEtape = Etape("", LatLng(location.latitude, location.longitude), false)
+                    etapeViewModel.insert(newEtape)
+                    googleMap.addMarker(MarkerOptions().position(lastEtape.location))
+
                 } catch (e1: IOException) {
                     e1.printStackTrace()
                     Toast.makeText(context, "Erreur à l'écriture du tag. Merci de réessayer.", Toast.LENGTH_SHORT).show()

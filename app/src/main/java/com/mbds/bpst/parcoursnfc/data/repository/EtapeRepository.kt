@@ -26,5 +26,10 @@ class EtapeRepository(private val parcoursDao: ParcoursDao) {
         return parcoursDao.getAllEtape()
     }
 
+    fun getAllEtapeByRead(read: Boolean): List<Etape>{
+        return parcoursDao.getAllEtapeByRead(read)
+    }
+
+
 
 }

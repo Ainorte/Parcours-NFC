@@ -11,6 +11,9 @@ interface ParcoursDao {
     @Query("SELECT * FROM parcours")
     fun getAllParcours(): List<Parcours>
 
+    @Query("SELECT * FROM etape WHERE status LIKE :read ORDER BY id")
+    fun getAllEtapeByRead(read: Boolean): List<Etape>
+
     @Query("SELECT * FROM etape")
     fun getAllEtape(): List<Etape>
 
