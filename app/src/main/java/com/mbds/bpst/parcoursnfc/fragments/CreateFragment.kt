@@ -152,6 +152,7 @@ class CreateFragment : Fragment(), ActionNFC {
                     ndef.writeNdefMessage(ndefMessage)
                     ndef.close()
                     Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_SHORT).show()
+                    binding.descField.setText("")
                     //On récupère la localisation actuelle et on l'écrit en base de donnée
 
                     val newEtape = Etape("", LatLng(location.latitude, location.longitude), false)
