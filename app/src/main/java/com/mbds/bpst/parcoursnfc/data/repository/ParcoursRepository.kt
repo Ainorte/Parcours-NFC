@@ -26,7 +26,7 @@ class ParcoursRepository(private val parcoursDao: ParcoursDao) {
     }
 
     @JvmName("getAllParcours1")
-    fun getAllParcourss(): List<Parcours> {
+    fun getAllParcours(): List<Parcours> {
         return parcoursDao.getAllParcours()
     }
 

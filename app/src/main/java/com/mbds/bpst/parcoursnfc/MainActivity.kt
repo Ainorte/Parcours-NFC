@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
 
-    val parcoursViewModel: ParcoursViewModel by viewModels {
+    public val parcoursViewModel: ParcoursViewModel by viewModels {
         ParcoursViewModelFactory((application as ParcoursApplication).repository)
     }
 

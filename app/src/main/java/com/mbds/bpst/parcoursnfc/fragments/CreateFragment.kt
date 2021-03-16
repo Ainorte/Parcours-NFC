@@ -30,6 +30,7 @@ import com.mbds.bpst.parcoursnfc.data.ParcoursRoomDatabase_Impl
 import com.mbds.bpst.parcoursnfc.data.dao.ParcoursDao_Impl
 import com.mbds.bpst.parcoursnfc.data.entities.Etape
 import com.mbds.bpst.parcoursnfc.data.repository.EtapeRepository
+import com.mbds.bpst.parcoursnfc.data.repository.ParcoursRepository
 import com.mbds.bpst.parcoursnfc.databinding.FragmentCreateBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ class CreateFragment : Fragment(), ActionNFC {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
+    private lateinit var parcoursRepository: ParcoursRepository
     private var firstLoc = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,10 +145,15 @@ class CreateFragment : Fragment(), ActionNFC {
                     ndef.writeNdefMessage(ndefMessage)
                     ndef.close()
                     Toast.makeText(context, "Message écrit avec succès", Toast.LENGTH_SHORT).show()
+                    //On récupère la localisation actuelle et on l'écrit en base de donnée
+                    
                 } catch (e1: IOException) {
                     e1.printStackTrace()
+                    Toast.makeText(context, "Erreur à l'écriture du tag. Merci de réessayer.", Toast.LENGTH_SHORT).show()
+
                 } catch (e2: FormatException) {
                     e2.printStackTrace()
+                    Toast.makeText(context, "Erreur à l'écriture du tag. Merci de réessayer.", Toast.LENGTH_SHORT).show()
                 }
             }
         }

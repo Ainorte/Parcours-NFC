@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
+import com.mbds.bpst.parcoursnfc.data.models.ParcoursViewModel
 import com.mbds.bpst.parcoursnfc.databinding.FragmentPlayBinding
 import java.io.UnsupportedEncodingException
 import kotlin.experimental.and
@@ -40,6 +41,7 @@ class PlayFragment : Fragment(), ActionNFC{
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
     private var firstLoc = true
+    private lateinit var viewModel: ParcoursViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,6 +71,7 @@ class PlayFragment : Fragment(), ActionNFC{
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel = (activity as MainActivity).parcoursViewModel
         binding = FragmentPlayBinding.inflate(inflater, container, false)
         var mapFragment =  childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(callback)

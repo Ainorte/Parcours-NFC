@@ -42,15 +42,15 @@ abstract class ParcoursRoomDatabase : RoomDatabase() {
             var parcours1 = Parcours("Parcours 1")
             var indice3 = "Fin du parcours"
             var latLng3 = LatLng(0.000000, 0.000000)
-            var etape3 = Etape(indice3, latLng3)
+            var etape3 = Etape(indice3, latLng3, false)
 
             var indice2 = "Près de la cafetière"
             var latLng2= LatLng(43.615115,7.061264)
-            var etape2 = Etape(indice2, latLng2)
+            var etape2 = Etape(indice2, latLng2, false)
 
             var indice1 = "Point de départ"
             var latLng1 = LatLng(43.750234, 7.072342)
-            var etape1 = Etape(indice1, latLng1)
+            var etape1 = Etape(indice1, latLng1, false)
 
             var listEtape = listOf<Etape>(etape1, etape2, etape3)
             // Add sample articles.
