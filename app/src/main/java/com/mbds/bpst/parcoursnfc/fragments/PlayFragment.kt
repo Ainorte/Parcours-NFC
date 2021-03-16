@@ -2,9 +2,7 @@ package com.mbds.bpst.parcoursnfc.fragments
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.icu.text.Transliterator
 import android.location.Location
-import android.location.LocationListener
 import android.nfc.NdefMessage
 import android.nfc.Tag
 import android.nfc.tech.Ndef
@@ -16,17 +14,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
-import com.mbds.bpst.parcoursnfc.data.models.ParcoursViewModel
+import com.mbds.bpst.parcoursnfc.data.models.EtapeViewModel
 import com.mbds.bpst.parcoursnfc.databinding.FragmentPlayBinding
 import java.io.UnsupportedEncodingException
 import kotlin.experimental.and
@@ -41,7 +37,7 @@ class PlayFragment : Fragment(), ActionNFC{
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
     private var firstLoc = true
-    private lateinit var viewModel: ParcoursViewModel
+    private lateinit var viewModel: EtapeViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +67,7 @@ class PlayFragment : Fragment(), ActionNFC{
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = (activity as MainActivity).parcoursViewModel
+        viewModel = (activity as MainActivity).etapeViewModel
         binding = FragmentPlayBinding.inflate(inflater, container, false)
         var mapFragment =  childFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(callback)

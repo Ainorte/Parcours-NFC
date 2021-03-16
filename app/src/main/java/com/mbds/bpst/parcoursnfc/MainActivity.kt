@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -24,14 +23,12 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.mbds.bpst.parcoursnfc.data.ParcoursApplication
-import com.mbds.bpst.parcoursnfc.data.models.ParcoursViewModel
-import com.mbds.bpst.parcoursnfc.data.models.ParcoursViewModelFactory
+import com.mbds.bpst.parcoursnfc.data.models.EtapeViewModel
+import com.mbds.bpst.parcoursnfc.data.models.EtapeViewModelFactory
 import com.mbds.bpst.parcoursnfc.databinding.ActivityMainBinding
 import com.mbds.bpst.parcoursnfc.fragments.ActionNFC
 import com.mbds.bpst.parcoursnfc.fragments.CreateFragment
 import com.mbds.bpst.parcoursnfc.fragments.PlayFragment
-import java.io.UnsupportedEncodingException
-import kotlin.experimental.and
 
 
 class MainActivity : AppCompatActivity() {
@@ -43,8 +40,8 @@ class MainActivity : AppCompatActivity() {
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
 
-    public val parcoursViewModel: ParcoursViewModel by viewModels {
-        ParcoursViewModelFactory((application as ParcoursApplication).repository)
+    val etapeViewModel: EtapeViewModel by viewModels {
+        EtapeViewModelFactory((application as ParcoursApplication).repository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

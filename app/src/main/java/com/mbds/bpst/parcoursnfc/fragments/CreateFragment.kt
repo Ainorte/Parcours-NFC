@@ -26,21 +26,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mbds.bpst.parcoursnfc.MainActivity
 import com.mbds.bpst.parcoursnfc.R
-import com.mbds.bpst.parcoursnfc.data.ParcoursRoomDatabase_Impl
-import com.mbds.bpst.parcoursnfc.data.dao.ParcoursDao_Impl
 import com.mbds.bpst.parcoursnfc.data.entities.Etape
 import com.mbds.bpst.parcoursnfc.data.models.EtapeViewModel
-import com.mbds.bpst.parcoursnfc.data.repository.EtapeRepository
-import com.mbds.bpst.parcoursnfc.data.repository.ParcoursRepository
 import com.mbds.bpst.parcoursnfc.databinding.FragmentCreateBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
+import kotlinx.coroutines.*
 import java.io.IOException
-import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
-import java.util.*
+import java.time.Instant
 
 
 class CreateFragment : Fragment(), ActionNFC {
@@ -53,6 +45,7 @@ class CreateFragment : Fragment(), ActionNFC {
     private lateinit var locationRequest: LocationRequest
     private lateinit var etapeViewModel: EtapeViewModel
     private var firstLoc = true
+    private var lastEtape:Etape? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +69,16 @@ class CreateFragment : Fragment(), ActionNFC {
             fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
+
+
+        etapeViewModel = (activity as MainActivity).etapeViewModel
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO)
+            {
+                lastEtape = etapeViewModel.getAllEtapeByRead(false).lastOrNull()
+            }
+        }
 
     }
 
@@ -118,12 +121,13 @@ class CreateFragment : Fragment(), ActionNFC {
             Toast.makeText(context, "Ce tag n'est pas modifiable", Toast.LENGTH_LONG).show()
         }
         else{
-            var lastEtape = etapeViewModel.getAllEtapeByRead(false).last()
 
             val dimension = 2
             val ndefRecords = arrayOfNulls<NdefRecord>(dimension)
 
-            var msgTxt = "${lastEtape.location.latitude};${lastEtape.location.longitude}"
+            var msgTxt =  lastEtape?.let {
+                "${it.location.latitude};${it.location.longitude}"
+            } ?: ""
             var mimeType = "application/parcoursnfc" // your MIME type
             var ndefRecord = NdefRecord.createMime(
                 mimeType,
@@ -152,7 +156,8 @@ class CreateFragment : Fragment(), ActionNFC {
 
                     val newEtape = Etape("", LatLng(location.latitude, location.longitude), false)
                     etapeViewModel.insert(newEtape)
-                    googleMap.addMarker(MarkerOptions().position(lastEtape.location))
+
+                    lastEtape?.location?.let {googleMap.addMarker( MarkerOptions().position(it))}
 
                 } catch (e1: IOException) {
                     e1.printStackTrace()

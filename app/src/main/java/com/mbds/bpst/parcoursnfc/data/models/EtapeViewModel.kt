@@ -4,18 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mbds.bpst.parcoursnfc.data.entities.Etape
-import com.mbds.bpst.parcoursnfc.data.entities.Parcours
 import com.mbds.bpst.parcoursnfc.data.repository.EtapeRepository
-import com.mbds.bpst.parcoursnfc.data.repository.ParcoursRepository
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class EtapeViewModel(private val repository: EtapeRepository): ViewModel() {
 
 
-    fun getAllEtape() = repository.getAllEtapes()
+    suspend fun getAllEtape() = repository.getAllEtapes()
 
-    fun getAllEtapeByRead(read: Boolean) = repository.getAllEtapeByRead(read)
+    suspend fun getAllEtapeByRead(read: Boolean) = repository.getAllEtapeByRead(read)
 
 
     fun insert(parcours: Etape) = viewModelScope.launch {
