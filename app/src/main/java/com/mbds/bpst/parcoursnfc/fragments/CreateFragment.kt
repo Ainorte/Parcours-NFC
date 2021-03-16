@@ -51,9 +51,6 @@ class CreateFragment : Fragment(), ActionNFC {
     private lateinit var locationRequest: LocationRequest
     private var firstLoc = true
 
-    val repo = EtapeRepository(ParcoursDao_Impl(ParcoursRoomDatabase_Impl()))
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -68,10 +65,6 @@ class CreateFragment : Fragment(), ActionNFC {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(location.latitude, location.longitude)))
                     firstLoc = false;
                 }
-
-                lifecycleScope.launch {
-                    insertData()
-                }
             }
         }
 
@@ -81,13 +74,6 @@ class CreateFragment : Fragment(), ActionNFC {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }!!
 
-    }
-
-    suspend fun insertData(){
-        withContext(Dispatchers.IO)
-        {
-            repo.insert(Etape("toto", LatLng(location.latitude, location.longitude)))
-        }
     }
 
     override fun onCreateView(
