@@ -103,6 +103,7 @@ class CreateFragment : Fragment(), ActionNFC {
                     val etapes = etapeViewModel.getAllEtapeByRead(false)
                     etapes.forEach { etape -> etapeViewModel.deleteEtape(etape) }
                     withContext(Dispatchers.Main){
+                        lastEtape = null
                         googleMap.clear();
                         Toast.makeText(context, "Parcours remis à zero", Toast.LENGTH_LONG).show()
                     }
@@ -173,10 +174,10 @@ class CreateFragment : Fragment(), ActionNFC {
                     binding.descField.setText("")
                     //On récupère la localisation actuelle et on l'écrit en base de donnée
 
-                    val newEtape = Etape("", LatLng(location.latitude, location.longitude), false)
-                    etapeViewModel.insert(newEtape)
+                    lastEtape = Etape("", LatLng(location.latitude, location.longitude), false)
+                    etapeViewModel.insert(lastEtape!!)
 
-                    googleMap.addMarker( MarkerOptions().position(newEtape.location))
+                    googleMap.addMarker( MarkerOptions().position(lastEtape!!.location))
 
                 } catch (e1: IOException) {
                     e1.printStackTrace()
