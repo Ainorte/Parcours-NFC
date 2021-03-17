@@ -16,12 +16,12 @@ class EtapeViewModel(private val repository: EtapeRepository): ViewModel() {
     suspend fun getAllEtapeByRead(read: Boolean) = repository.getAllEtapeByRead(read)
 
 
-    fun insert(parcours: Etape) = viewModelScope.launch {
-        repository.insert(parcours)
+    fun insert(etape: Etape) = viewModelScope.launch {
+        repository.insert(etape)
     }
 
-    fun deleteEtape(parcours: Etape) = viewModelScope.launch {
-        repository.delete(parcours)
+    fun deleteEtape(etape: Etape) = viewModelScope.launch {
+        repository.delete(etape)
     }
 
 }
