@@ -73,13 +73,6 @@ class CreateFragment : Fragment(), ActionNFC {
 
         etapeViewModel = (activity as MainActivity).etapeViewModel
 
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO)
-            {
-                lastEtape = etapeViewModel.getAllEtapeByRead(false).lastOrNull()
-            }
-        }
-
     }
 
     override fun onCreateView(
@@ -101,7 +94,21 @@ class CreateFragment : Fragment(), ActionNFC {
                 Looper.getMainLooper())
         activity?.title = "Créer un nouveau parcours"
         var act = activity as MainActivity
-        act.setMenuCreateButtonVisibility(false)
+        act.setMenuButtonVisibility(R.id.createItem,false)
+        act.setMenuButtonVisibility(R.id.resetItem,true)
+        act.onReset = {
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO)
+                {
+                    val etapes = etapeViewModel.getAllEtapeByRead(false)
+                    etapes.forEach { etape -> etapeViewModel.deleteEtape(etape) }
+                    withContext(Dispatchers.Main){
+                        googleMap.clear();
+                        Toast.makeText(context, "Parcours remis à zero", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
     }
 
     override fun onPause() {
@@ -114,6 +121,17 @@ class CreateFragment : Fragment(), ActionNFC {
         this.googleMap = googleMap
         this.googleMap.moveCamera(CameraUpdateFactory.zoomTo(17.0f))
         this.googleMap.isMyLocationEnabled = true
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO)
+            {
+                val etapes = etapeViewModel.getAllEtapeByRead(false)
+                lastEtape = etapes.lastOrNull()
+                withContext(Dispatchers.Main){
+                    etapes.forEach { etape -> googleMap.addMarker(MarkerOptions().position(etape.location)) }
+                }
+            }
+        }
     }
 
     override fun onNFC(tag: Tag, ndef: Ndef, rawMsgs: Array<Parcelable>?, context: Context) {
@@ -158,7 +176,7 @@ class CreateFragment : Fragment(), ActionNFC {
                     val newEtape = Etape("", LatLng(location.latitude, location.longitude), false)
                     etapeViewModel.insert(newEtape)
 
-                    lastEtape?.location?.let {googleMap.addMarker( MarkerOptions().position(it))}
+                    googleMap.addMarker( MarkerOptions().position(newEtape.location))
 
                 } catch (e1: IOException) {
                     e1.printStackTrace()

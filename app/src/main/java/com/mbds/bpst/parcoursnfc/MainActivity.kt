@@ -15,6 +15,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -30,12 +31,12 @@ import com.mbds.bpst.parcoursnfc.fragments.PlayFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private var fragment:Fragment? = null
-
     private lateinit var binding: ActivityMainBinding
     private var menu: Menu? = null
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
+
+    var onReset: ((MainActivity) -> Unit)? = null
 
     val etapeViewModel: EtapeViewModel by viewModels {
         EtapeViewModelFactory((application as ParcoursApplication).repository)
@@ -51,7 +52,6 @@ class MainActivity : AppCompatActivity() {
         val frag = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
         if(frag != null){
-            fragment = frag
             nfcTrigger(intent)
         }
         else {
@@ -108,8 +108,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun changeFragment(fragment: Fragment, addToBackStack: Boolean = true) {
-        this.fragment = fragment
-
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, fragment)
             if (addToBackStack)
@@ -183,12 +181,16 @@ class MainActivity : AppCompatActivity() {
                 changeFragment(CreateFragment(), true)
                 true
             }
+            R.id.resetItem -> {
+                onReset?.let { it(this) }
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    fun setMenuCreateButtonVisibility(visibility: Boolean){
-        menu?.findItem(R.id.createItem)?.isVisible  = visibility
+    fun setMenuButtonVisibility(@IdRes button: Int, visibility: Boolean){
+        menu?.findItem(button)?.isVisible  = visibility
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -209,8 +211,9 @@ class MainActivity : AppCompatActivity() {
 
                 val rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
 
-                if(fragment is ActionNFC){
-                    (fragment as ActionNFC).onNFC(tag, ndef, rawMsgs, this)
+                val frag = supportFragmentManager.findFragmentById(R.id.fragment_container)
+                if(frag is ActionNFC){
+                    (frag as ActionNFC).onNFC(tag, ndef, rawMsgs, this)
                 }
             }
         }

@@ -89,8 +89,9 @@ class PlayFragment : Fragment(), ActionNFC{
         activity?.title = "Parcours NFC"
 
         var act = activity as MainActivity
-        act.setMenuCreateButtonVisibility(true)
-
+        act.setMenuButtonVisibility(R.id.createItem,true)
+        act.setMenuButtonVisibility(R.id.resetItem,true)
+        act.onReset = null
     }
 
     override fun onPause() {
@@ -114,7 +115,6 @@ class PlayFragment : Fragment(), ActionNFC{
             for (j in ndefMessage[i]!!.records.indices) {
                 val ndefRecord = ndefMessage[i]!!.records[j]
                 val payload = ndefRecord.payload
-                val languageSize: Int = (payload[0] and 51.toByte()).toInt()
                 try {
                     val type = ndefRecord.toMimeType()
                     val recordTxt = String(
