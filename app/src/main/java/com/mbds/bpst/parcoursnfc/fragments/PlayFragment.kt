@@ -116,8 +116,10 @@ class PlayFragment : Fragment(), ActionNFC{
                     etapes.forEach { etape -> etapeViewModel.deleteEtape(etape) }
                     withContext(Dispatchers.Main){
                         lastEtape = null
+                        lastMarker = null
                         googleMap.clear();
                         Toast.makeText(context, "Parcours remis à zero", Toast.LENGTH_LONG).show()
+                        binding.description.text = requireContext().getText(R.string.welcome)
                     }
                 }
             }
