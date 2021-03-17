@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@Database(entities = arrayOf(Etape::class), version = 2, exportSchema = false)
+@Database(entities = arrayOf(Etape::class), version = 3, exportSchema = false)
 @TypeConverters(LocationConverters::class)
 
 abstract class EtapeRoomDatabase : RoomDatabase() {
