@@ -5,14 +5,11 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
-import android.os.Parcelable
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -51,19 +48,27 @@ class MainActivity : AppCompatActivity() {
 
         launchNFC()
 
-        if( ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            //Demander la permission d'utiliser le GPS
-            if(shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION)){
-                //Nous avons déjà demandé la permission
-                explainForPermission()
-            }else{
-                //On demande pour la première fois
-                askForPermission()
-            }
-        }else{
-            //c'est ok pour le GPS
-            changeFragment(PlayFragment(), false)
+        val frag = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+        if(frag != null){
+            fragment = frag
             nfcTrigger(intent)
+        }
+        else {
+            if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                //Demander la permission d'utiliser le GPS
+                if (shouldShowRequestPermissionRationale(permission.ACCESS_FINE_LOCATION)) {
+                    //Nous avons déjà demandé la permission
+                    explainForPermission()
+                } else {
+                    //On demande pour la première fois
+                    askForPermission()
+                }
+            } else {
+                //c'est ok pour le GPS
+                changeFragment(PlayFragment(), false)
+                nfcTrigger(intent)
+            }
         }
 
     }
